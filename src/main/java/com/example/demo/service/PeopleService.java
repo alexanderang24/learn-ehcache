@@ -9,6 +9,7 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.*;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -62,9 +63,14 @@ public class PeopleService {
     @Autowired
     CacheManager cacheManager;
 
+    @Nullable
     public void flushCache() {
         for (String cacheName : cacheManager.getCacheNames()) {
-            cacheManager.getCache(cacheName).clear();
+            try {
+                cacheManager.getCache(cacheName).clear();
+            } catch (NullPointerException ex) {
+
+            }
             log.info("Flushing cache with name: " + cacheName);
         }
     }
