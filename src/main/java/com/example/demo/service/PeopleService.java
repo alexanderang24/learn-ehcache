@@ -26,31 +26,27 @@ public class PeopleService {
 
     @Cacheable(cacheNames = "findAllCache")
     public List<PeopleDto> findAll() {
-        log.info("Connecting to DB...");
         return peopleMapper.peopleListToPeopleDtoList(peopleRepository.findAll());
     }
 
-    @Caching(evict = {
-            @CacheEvict(value = "findAllCache", allEntries = true),
-            @CacheEvict(value = "findByIdCache", allEntries = true)})
-    public PeopleDto savePeople(PeopleDto peopleDto) {
-        if(peopleDto.getId() == null) {
-            log.info("Inserting new people...");
-            return peopleMapper.peopleToPeopleDto(peopleRepository.save(peopleMapper.peopleDtoToPeople(peopleDto)));
-        } else {
-            log.info("Updating people...");
-            if(findById(peopleDto.getId()) != null) {
-                return peopleMapper.peopleToPeopleDto(peopleRepository.save(peopleMapper.peopleDtoToPeople(peopleDto)));
-            } else {
-                log.error("Failed to save or update");
-                return null;
-            }
-        }
+//    @CachePut(value = "findByIdCache", key = "#peopleDto.id", condition = "#peopleDto.firstName.equals('Sar') && result != null", unless = "#peopleDto.id < 20")
+    @Caching(put = {
+            @CachePut(value = "findAllCache"),
+            @CachePut(value = "findByIdCache", key = "#peopleDto.id")
+    })
+    public PeopleDto updatePeople(PeopleDto peopleDto) {
+        log.info("Update: Updating cache with name: findAllCache and findByIdCache");
+        return peopleMapper.peopleToPeopleDto(peopleRepository.save(peopleMapper.peopleDtoToPeople(peopleDto)));
     }
 
-    @Cacheable(cacheNames = "findByIdCache")
+    @CacheEvict(cacheNames = "findAllCache")
+    public PeopleDto insertPeople(PeopleDto peopleDto) {
+        log.info("Insert: Flushing cache with name: findAllCache");
+        return peopleMapper.peopleToPeopleDto(peopleRepository.save(peopleMapper.peopleDtoToPeople(peopleDto)));
+    }
+
+    @Cacheable(cacheNames = "findByIdCache", key = "#id")
     public PeopleDto findById(Long id) {
-        log.info("Connecting to DB...");
         Optional<People> findPeople = peopleRepository.findById(id);
         if(findPeople.isPresent()) {
             return peopleMapper.peopleToPeopleDto(findPeople.get());
@@ -66,11 +62,7 @@ public class PeopleService {
     @Nullable
     public void flushCache() {
         for (String cacheName : cacheManager.getCacheNames()) {
-            try {
-                cacheManager.getCache(cacheName).clear();
-            } catch (NullPointerException ex) {
-
-            }
+            cacheManager.getCache(cacheName).clear();
             log.info("Flushing cache with name: " + cacheName);
         }
     }

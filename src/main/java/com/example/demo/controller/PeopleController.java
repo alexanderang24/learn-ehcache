@@ -26,10 +26,16 @@ public class PeopleController {
         return peopleService.findById(peopleRequest.getId());
     }
 
+    @PostMapping(value = "/insert")
+    public PeopleDto insertPeople(@RequestBody PeopleDto peopleRequest) {
+        return peopleService.insertPeople(peopleRequest);
+    }
+
     @PostMapping(value = "/update")
     public PeopleDto updatePeople(@RequestBody PeopleDto peopleRequest) {
-        return peopleService.savePeople(peopleRequest);
+        return peopleService.updatePeople(peopleRequest);
     }
+
 
     @PostMapping(value = "/flush")
     public void flushCache() {
