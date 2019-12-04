@@ -29,7 +29,7 @@
     </cache>
 
     <cache alias="findByIdCache">
-                <key-type>java.lang.Long</key-type>
+        <key-type>java.lang.Long</key-type>
 <!--                <value-type>com.example.demo.dto.PeopleDto</value-type>-->
         <expiry>
             <tti unit="seconds">5</tti>

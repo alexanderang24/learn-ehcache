@@ -7,6 +7,7 @@ import com.example.demo.repository.PeopleRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.*;
 import org.springframework.lang.Nullable;
@@ -20,11 +21,17 @@ import java.util.Optional;
 public class PeopleService {
 
     @Autowired
+    CacheManager cacheManager;
+
+    @Autowired
     PeopleRepository peopleRepository;
 
     private PeopleMapper peopleMapper = Mappers.getMapper(PeopleMapper.class);
 
-    @Cacheable(cacheNames = "findAllCache")
+    @Cacheable(
+            cacheNames = "findAllCache",
+            unless = "#result == null"
+    )
     public List<PeopleDto> findAll() {
         return peopleMapper.peopleListToPeopleDtoList(peopleRepository.findAll());
     }
@@ -45,7 +52,11 @@ public class PeopleService {
         return peopleMapper.peopleToPeopleDto(peopleRepository.save(peopleMapper.peopleDtoToPeople(peopleDto)));
     }
 
-    @Cacheable(cacheNames = "findByIdCache", key = "#id")
+    @Cacheable(
+            cacheNames = "findByIdCache",
+            key = "#id",
+            unless = "#result == null"
+    )
     public PeopleDto findById(Long id) {
         Optional<People> findPeople = peopleRepository.findById(id);
         if(findPeople.isPresent()) {
@@ -55,9 +66,6 @@ public class PeopleService {
             return null;
         }
     }
-
-    @Autowired
-    CacheManager cacheManager;
 
     @Nullable
     public void flushCache() {
