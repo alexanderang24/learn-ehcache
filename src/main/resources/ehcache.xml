@@ -6,8 +6,6 @@
             http://www.ehcache.org/v3/jsr107 http://www.ehcache.org/schema/ehcache-107-ext-3.0.xsd">
 
     <cache alias="findAllCache">
-<!--        <key-type>java.lang.Long</key-type>-->
-<!--        <value-type>java.math.BigDecimal</value-type>-->
         <expiry>
             <ttl unit="seconds">5</ttl>
         </expiry>
@@ -29,8 +27,8 @@
     </cache>
 
     <cache alias="findByIdCache">
-        <key-type>java.lang.Long</key-type>
-<!--                <value-type>com.example.demo.dto.PeopleDto</value-type>-->
+<!--        <key-type>java.lang.Long</key-type>-->
+<!--        <value-type>com.example.demo.dto.PeopleDto</value-type>-->
         <expiry>
             <tti unit="seconds">5</tti>
         </expiry>
@@ -53,6 +51,4 @@
             <offheap unit="MB">50</offheap>
         </resources>
     </cache>
-
-
 </config>
