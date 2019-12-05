@@ -7,10 +7,8 @@ import com.example.demo.repository.PeopleRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.*;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,7 +34,6 @@ public class PeopleService {
         return peopleMapper.peopleListToPeopleDtoList(peopleRepository.findAll());
     }
 
-//    @CachePut(value = "findByIdCache", key = "#peopleDto.id", condition = "#peopleDto.firstName.equals('Sar') && result != null", unless = "#peopleDto.id < 20")
     @Caching(put = {
             @CachePut(value = "findAllCache"),
             @CachePut(value = "findByIdCache", key = "#peopleDto.id")
@@ -67,7 +64,6 @@ public class PeopleService {
         }
     }
 
-    @Nullable
     public void flushCache() {
         for (String cacheName : cacheManager.getCacheNames()) {
             cacheManager.getCache(cacheName).clear();
